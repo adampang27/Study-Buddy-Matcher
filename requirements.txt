@@ -13,6 +13,5 @@ jinja2
 starlette
 psycopg2-binary
 python-dotenv
-mysql-connector-python
-mysql
+pymysql
 itsdangerous

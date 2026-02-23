@@ -17,7 +17,10 @@ is_render = "RENDER" in os.environ
 DATABASE_URL = None
 
 # Default MySQL connection string
-DEFAULT_MYSQL_URL = "mysql+pymysql://root:Siraulo76!@localhost:3306/smart_buddy"
+DEFAULT_MYSQL_URL = os.getenv(
+    "DATABASE_URL",
+    "mysql+pymysql://root:password@localhost:3306/smart_buddy"
+)
 
 # Check for a DATABASE_URL environment variable, common on hosting platforms
 if os.getenv("DATABASE_URL"):

@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI, Request, Form, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -14,7 +16,7 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Smart Buddy API")
 
-app.add_middleware(SessionMiddleware, secret_key="SUPER_SECRET_KEY")
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY", "change-this-in-production"))
 app.mount('/static', StaticFiles(directory='smart_buddy/static'), name='static')
 templates = Jinja2Templates(directory="smart_buddy/templates")
 
