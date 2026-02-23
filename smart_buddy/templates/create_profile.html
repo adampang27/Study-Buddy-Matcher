@@ -138,19 +138,16 @@
       const formData = new FormData(form);
 
       const profile = {
-        name: formData.get("name"),
-        email: formData.get("email"),
-        major: formData.get("major"),
-        bio: formData.get("bio"),
-        personality_traits: [...formData.getAll("traits")].join(","),
-        study_style: formData.get("study_style"),
-        preferred_environment: formData.get("preferred_environment"),
-        study_subjects: formData.get("study_subjects"),
-        availability: formData.get("availability"),
-        goals: formData.get("goals")
-      };
-
-      const response = await fetch("http://127.0.0.1:8000/profiles/", {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      personality_type: [...formData.getAll("traits")].join(","),
+      study_style: formData.get("study_style"),
+      environment: formData.get("preferred_environment"),
+      academic_focus_areas: formData.get("study_subjects"),  
+      availability: formData.get("availability"),
+    };
+      // Use relative URL instead of hardcoded localhost
+      const response = await fetch("/profiles/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(profile)
