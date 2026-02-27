@@ -126,8 +126,6 @@ async def ratings(request: Request):
     username = request.session.get("username")
     if not username:
         return RedirectResponse("/login", status_code=303)
-    if username != "jbiggs7":
-        return RedirectResponse("/not-authorized", status_code=303)
     ratings = [
         {"session": "Calculus II", "partner": "biggsjasmine05", "score": 5, "feedback": "Great session!"},
         {"session": "Cybersecurity", "partner": "johnstudent1", "score": 4, "feedback": "Very helpful."},
