@@ -1,5 +1,4 @@
 import os
-
 from fastapi import FastAPI, Request, Form, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -7,7 +6,6 @@ from starlette.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 from sqlalchemy.orm import Session
 
-# Fix imports to use the correct module path
 from .db import engine, get_db
 from .models import Base, User, Profile, Session as StudySession, Rating
 
@@ -55,11 +53,11 @@ async def post_profile(
     study_style: str = Form(...),
     preferred_environment: str = Form(...),
     personality_traits: str = Form(...),
-    academic_focus_areas: str = Form(...),
+    academic_focus_areas: str = Form(None), # If no academic focus is selected
     password: str = Form(...),
     availability: str = Form(...)
 ):
-    # In a real app, save to DB. For demo, just set session.
+    
     request.session["username"] = username
     return templates.TemplateResponse("success.html", {"request": request, "username": username})
 
