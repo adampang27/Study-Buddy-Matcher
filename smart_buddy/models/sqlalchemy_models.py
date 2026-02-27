@@ -2,6 +2,15 @@ from sqlalchemy import Column, Integer, String, Text, JSON, DateTime
 from sqlalchemy.sql import func
 from smart_buddy.db import Base
 
+class User(Base):
+    __tablename__ = "users"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(50), unique=True, index=True)
+    email = Column(String(100), unique=True, index=True)
+    password = Column(String(100))
+    created_at = Column(DateTime, default=func.now())
+
 class Profile(Base):
     __tablename__ = 'profiles'
     

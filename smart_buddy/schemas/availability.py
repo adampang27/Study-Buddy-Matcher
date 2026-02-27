@@ -41,14 +41,14 @@ class AvailabilityCreate(BaseModel):
     
     
 class AvailabilityResponse(BaseModel):
-    id: int
-    user_id: int
-    availability_type: str
+    id: Optional[int] = None
+    user_id: Optional[int] = None
+    availability_type: Optional[str] = None
     date: Optional[date] = None
     day_of_week: Optional[int] = None
-    start_time: time
-    end_time: time
-    is_active: bool
+    start_time: Optional[time] = None
+    end_time: Optional[time] = None
+    is_active: Optional[bool] = None
     
     class Config:
         from_attributes = True

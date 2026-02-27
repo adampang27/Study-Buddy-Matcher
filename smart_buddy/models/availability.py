@@ -25,4 +25,4 @@ class Availability(Base):
     is_active = Column(Boolean, default=True)
     
     # Relationship back to user
-    user = relationship("UserProfile", back_populates="availability")
+    user = relationship("UserProfile", back_populates="availability_rel")

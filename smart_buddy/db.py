@@ -10,23 +10,28 @@ load_dotenv()
 
 # --- Database Configuration ---
 
-# Get database connection parameters from environment variables with defaults for local dev
-DB_USER = os.getenv("DB_USER", "root")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "password")
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "3306")
-DB_NAME = os.getenv("DB_NAME", "smart_buddy")
-
-# Prioritize DATABASE_URL if it exists 
+# Prioritize DATABASE_URL if it exists (Render/Production)
 DATABASE_URL = os.getenv("DATABASE_URL")
+
+# If no DATABASE_URL, check for MySQL environment variables
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT", "3306")
+DB_NAME = os.getenv("DB_NAME")
 
 if DATABASE_URL:
     # SQLAlchemy requires "postgresql://"
     if DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-else:
-    # Construct MySQL URL from individual components
+elif all([DB_USER, DB_HOST, DB_NAME]):
+    # Construct MySQL URL if variables are provided
     DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+else:
+    # DEFAULT: Use SQLite for zero-setup local "vibe" coding
+    # This creates a local file named 'smart_buddy.db'
+    DATABASE_URL = "sqlite:///./smart_buddy.db"
+    print("No database environment variables found. Falling back to local SQLite.")
 
 # Detect if the application is running on a platform like Render
 is_render = "RENDER" in os.environ
@@ -35,7 +40,12 @@ is_render = "RENDER" in os.environ
 
 try:
     # Create the SQLAlchemy engine using the determined URL
-    engine = create_engine(DATABASE_URL)
+    # connect_args={"check_same_thread": False} is required ONLY for SQLite
+    engine_args = {}
+    if DATABASE_URL.startswith("sqlite"):
+        engine_args["connect_args"] = {"check_same_thread": False}
+        
+    engine = create_engine(DATABASE_URL, **engine_args)
 
     # Create a configured "Session" class
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -45,14 +55,14 @@ try:
 
     # Test the database connection to ensure it's working
     with engine.connect() as connection:
-        print("Database connection established successfully!")
+        print(f"Database connection established successfully to {DATABASE_URL.split(':')[0]}!")
 
 except Exception as e:
     print(f"ERROR: Database connection failed: {e}", file=sys.stderr)
     if is_render:
         print("Hint: Ensure the DATABASE_URL environment variable is correctly set in your deployment environment.", file=sys.stderr)
     else:
-        print("Hint: Check that your local MySQL server is running, PyMySQL is installed (`pip install pymysql`), and the .env file has the correct credentials.", file=sys.stderr)
+        print("Hint: If using MySQL, check your .env credentials. Otherwise, SQLite should work out of the box.", file=sys.stderr)
     raise
 
 # --- Database Session Dependency ---
@@ -71,7 +81,8 @@ def create_tables():
     """Create all database tables defined by models inheriting from Base."""
     try:
         # Import models to ensure they're registered with the Base
-        from smart_buddy.sqlalchemy_models import Profile, Session, Rating
+        from smart_buddy.models.sqlalchemy_models import Profile, Session, Rating
+        from smart_buddy.models.availability import Availability
         Base.metadata.create_all(bind=engine)
         print("Database tables checked/created successfully.")
     except Exception as e:

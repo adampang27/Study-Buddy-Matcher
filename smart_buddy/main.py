@@ -9,19 +9,32 @@ from sqlalchemy.orm import Session
 from .db import engine, get_db
 from .models import Base, User, Profile, Session as StudySession, Rating
 
+# Import routers
+from .routers import availability, matching, rating, user_profile
+
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Smart Buddy API")
 
+# Add routers to the app
+app.include_router(availability.router)
+app.include_router(matching.router)
+app.include_router(rating.router)
+app.include_router(user_profile.router)
+
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY", "change-this-in-production"))
 app.mount('/static', StaticFiles(directory='smart_buddy/static'), name='static')
 templates = Jinja2Templates(directory="smart_buddy/templates")
 
+# For testing purposes
+def get_user_name():
+    return "Adam Pang"
+
 # Add a root endpoint to redirect to home
 @app.get("/")
 def redirect_to_home():
-    return RedirectResponse(url="/home", status_code=303)
+    return {"message": "SMART BUDDY environment setup successful!"}
 
 # --- LOGIN & PROFILE CREATION ---
 

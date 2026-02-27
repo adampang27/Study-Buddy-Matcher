@@ -1,5 +1,6 @@
 # smart_buddy/routers/availability.py
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from typing import List
@@ -7,10 +8,9 @@ from jose import JWTError, jwt
 from fastapi.security import OAuth2PasswordBearer
 
 # --- Local Imports ---
-# Combining imports from both branches
 from smart_buddy.db import get_db
-from smart_buddy.models.sqlalchemy_models import Profile, Availability # Assuming Availability model exists
-from smart_buddy.schemas.availability import AvailabilityCreate, AvailabilityResponse # Assuming these schemas are defined
+from smart_buddy.models import Profile, Availability
+from smart_buddy.schemas import AvailabilityCreate, AvailabilityResponse
 from smart_buddy.config import SECRET_KEY, ALGORITHM # For JWT
 
 # --- Router and Template Setup ---
