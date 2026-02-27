@@ -3,10 +3,26 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: smart_buddy
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - run: pip install -r requirements.txt
-      - run: python -m pytest smart_buddy/tests/ -v
+      - name: Run Tests
+        env:
+          DB_USER: root
+          DB_PASSWORD: password
+          DB_HOST: localhost
+          DB_NAME: smart_buddy
+          SECRET_KEY: test-secret-key
+        run: python -m pytest smart_buddy/tests/ -v
